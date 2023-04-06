@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -56,5 +57,24 @@ public class VideoListFragment extends Fragment {
         mBinding.recView.setLayoutManager(new LinearLayoutManager(requireContext()));
         videoAdapter = new VideoAdapter(requireContext(), mediaUri);
         mBinding.recView.setAdapter(videoAdapter);
+
+        mBinding.recView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+
+//                switch (newState) {
+//                    case RecyclerView.SCROLL_STATE_IDLE:
+//                        break;
+//                    case RecyclerView.SCROLL_STATE_IDLE:
+//                        break;
+//                }
+            }
+
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+            }
+        });
     }
 }
