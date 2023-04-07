@@ -2,10 +2,13 @@ package com.kbtech.newexovideos.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Rect;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 
 import androidx.annotation.NonNull;
 import androidx.media2.exoplayer.external.upstream.DefaultDataSourceFactory;
@@ -37,7 +40,6 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
     private int currentPlayingPosition = -1; // to keep track of the currently playing video position
     private static SimpleCache simpleCache;
 
-
     @SuppressLint("NotifyDataSetChanged")
     public VideoAdapter(Context context, List<String> mediaUri) {
         this.context = context;
@@ -60,14 +62,68 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
     public void onBindViewHolder(@NonNull VideoHolder holder, int position) {
         String videoUrl = mediaUri.get(position);
         holder.bind(context, videoUrl);
+//        currentPlayingPosition = holder.getAbsoluteAdapterPosition();
+        currentPlayingPosition = holder.getLayoutPosition();
+        Log.i("Video_Adapter", "onBindViewHolder adapterPos: "+currentPlayingPosition);
+
+
 
         // Autoplay the video when it comes into view
-        if (position == currentPlayingPosition) {
-            holder.startPlayer();
-        } else {
-            holder.stopPlayer();
-        }
+
+//        holder.styledPlayerView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+//            @Override
+//            public boolean onPreDraw() {
+//
+//                Rect rect = new Rect();
+//                Log.i("Video_Adapter", "onBindViewHolder rect: "+rect.top);
+//                Log.i("Video_Adapter", "onBindViewHolder rect: "+rect.bottom);
+//                holder.styledPlayerView.getLocalVisibleRect(rect);
+//                boolean isVisible = rect.bottom > 0 && rect.top < holder.styledPlayerView.getHeight();
+//
+//                // Play or pause the player accordingly
+//                if (isVisible && !holder.isPlaying) {
+//                    holder.startPlayer();
+//                } else if (!isVisible && holder.isPlaying) {
+//                    holder.stopPlayer();
+//                }
+//
+//                holder.styledPlayerView.getViewTreeObserver().removeOnPreDrawListener(this);
+//
+//                return true;
+//            }
+//        });
+
+//        if (position == currentPlayingPosition) {
+//            holder.bind(context, videoUrl);
+//            holder.startPlayer();
+//        } else {
+//            holder.stopPlayer();
+//        }
     }
+
+    public void setVideoPause(int lastplayPosition, boolean isplay) {
+//        initializePlayer();
+
+//        for (int i = 0; i < mPostList.size(); i++) {
+//            if (lastplayPosition == i) {
+//                if (mPostList.get(lastplayPosition).getPostItems().size() > 0) {
+//                    if (mPostList.get(lastplayPosition).getPostItems().get(0).getMediaType().equalsIgnoreCase("video")) {
+//                        if (isplay) {
+//                            player.setPlayWhenReady(true);
+//                        } else {
+//                            player.setPlayWhenReady(false);
+////                            notifyItemChanged(lastplayPosition);
+//                        }
+//                    }
+//                }
+//            }
+//        }
+    }
+
+//    private void initializePlayer() {
+//            player = ExoPlayerFactory.newSimpleInstance(mContext);
+//        }
+//    }
 
     public void setCurrentPlayingPosition(int currentPlayingPosition) {
         this.currentPlayingPosition = currentPlayingPosition;
@@ -82,9 +138,10 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
         ExoPlayer player;
         StyledPlayerView styledPlayerView;
 
+        boolean isPlaying = false;
+
         public VideoHolder(@NonNull View iv) {
             super(iv);
-
             styledPlayerView = iv.findViewById(R.id.player_view);
         }
 
@@ -120,7 +177,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
                 }
             });
 
-            player.setPlayWhenReady(true);
+            player.setPlayWhenReady(false);
 
             player.prepare();
 
@@ -130,12 +187,14 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
         public void startPlayer() {
             if (player != null) {
                 player.setPlayWhenReady(true);
+                isPlaying = true;
             }
         }
 
         public void stopPlayer() {
             if (player != null) {
-                player.setPlayWhenReady(false);
+                player.pause();
+                isPlaying = false;
             }
         }
     }
